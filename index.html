@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инструктаж по ГО и ЧС | ОИЯИ г. Дубна</title>
+    <style>
+        :root {
+            --primary-color: #0057b8;
+            --secondary-color: #ffd700;
+            --text-dark: #2c3e50;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-light); 
+            color: var(--text-dark);
+            line-height: 1.6;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        
+        .presentation-wrapper {
+            width: 95%; max-width: 1200px; height: 85vh;
+            background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 12px; overflow: hidden;
+            display: grid; grid-template-columns: 300px 1fr;
+        }
+        
+        .sidebar-nav {
+            background: linear-gradient(180deg, var(--primary-color), #003d82);
+            color: white; padding: 20px; overflow-y: auto;
+            border-right: 2px solid var(--secondary-color);
+        }
+        .sidebar-nav h3 { margin-bottom: 20px; text-align: center; font-size: 1.2rem; border-bottom: 1px solid var(--secondary-color); padding-bottom: 10px;}
+        .nav-list { list-style: none; }
+        .nav-item { margin-bottom: 8px; }
+        .nav-link {
+            display: block; color: #e0e0e0; text-decoration: none; padding: 10px 15px;
+            border-radius: 6px; transition: all 0.2s ease; cursor: pointer;
+            font-size: 0.95rem;
+        }
+        .nav-link:hover, .nav-link.active { 
+            background: var(--secondary-color); color: var(--text-dark); 
+            transform: translateX(5px);
+        }
+        
+        .slide-container {
+            padding: 30px 40px; overflow-y: auto;
+            position: relative;
+        }
+        .slide {
+            opacity: 0; transform: translateY(20px); transition: all 0.4s ease-in-out;
+            position: absolute; top: 30px; left: 40px; right: 40px;
+        }
+        .slide.active { opacity: 1; transform: translateY(0); position: static; }
+        
+        .slide-header { 
+            margin-bottom: 25px; border-left: 5px solid var(--primary-color); padding-left: 15px;
+        }
+        .slide-header h2 { font-size: 1.8rem; margin-bottom: 5px; color: var(--primary-color); }
+        .time-note { font-size: 0.9rem; color: #6c757d; font-style: italic; }
+        
+        .content-block p { margin-bottom: 15px; text-align: justify; }
+        .illustration-placeholder {
+            width: 100%; height: 250px; background: linear-gradient(45deg, #eee, #fff);
+            border: 2px dashed var(--border-color); border-radius: 8px;
+            display: flex; justify-content: center; align-items: center;
+            color: #888; font-weight: bold; margin: 20px 0;
+        }
+        
+        .accordion {
+            background: var(--bg-light); border: 1px solid var(--border-color); border-radius: 8px;
+            margin-bottom: 15px; overflow: hidden;
+        }
+        .accordion-header {
+            padding: 15px 20px; cursor: pointer; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+        }
+        .accordion-header:hover { background: #e9ecef; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; padding: 0 20px; }
+        .accordion-content.expanded { max-height: 500px; padding: 15px 20px; }
+        
+        ul, ol { padding-left: 25px; margin-bottom: 15px; }
+        li { margin-bottom: 8px; }
+        
+        .navigation-controls {
+            position: sticky; bottom: 20px; left: 40px; right: 40px; display: flex; justify-content: space-between; gap: 15px;
+        }
+        .btn-control {
+            padding: 12px 25px; border: none; border-radius: 50px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .btn-next { background: var(--primary-color); color: white; }
+        .btn-prev { background: #6c757d; color: white; }
+        .btn-control:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-control:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+    </style>
+</head>
+<body>
+
+<div class="presentation-wrapper">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar-nav">
+        <h3>Программа инструктажа</h3>
+        <ul class="nav-list" id="navList">
+            <li class="nav-item"><a href="#" data-slide="0" class="nav-link active">1. Понятия ГО и ЧС</a></li>
+            <li class="nav-item"><a href="#" data-slide="1" class="nav-link">2. Характерные ЧС района</a></li>
+            <li class="nav-item"><a href="#" data-slide="2" class="nav-link">3. Способы защиты работников</a></li>
+            <li class="nav-item"><a href="#" data-slide="3" class="nav-link">4. Сигналы оповещения</a></li>
+            <li class="nav-item"><a href="#" data-slide="4" class="nav-link">5. Действия при сигналах</a></li>
+            <li class="nav-item"><a href="#" data-slide="5" class="nav-link">6. АХОВ и Радиация</a></li>
+            <li class="nav-item"><a href="#" data-slide="6" class="nav-link">7. Использование СИЗ</a></li>
+            <li class="nav-item"><a href="#" data-slide="7" class="nav-link">8. Коллективная защита</a></li>
+            <li class="nav-item"><a href="#" data-slide="8" class="nav-link">9. Эвакуация</a></li>
+            <li class="nav-item"><a href="#" data-slide="9" class="nav-link">10. Права и обязанности</a></li>
+        </ul>
+    </div>
+
+    <!-- Slides Content -->
+    <div class="slide-container">
+        <!-- Slide 1 -->
+        <div class="slide active" id="slide-0">
+            <div class="slide-header">
+                <h2>Учебный вопрос №1: Понятия ГО и ЧС</h2>
+                <div class="time-note">Время проведения: 5–15 минут</div>
+            </div>
+            <div class="content-block">
+                <p><strong>Гражданская оборона (ГО)</strong> — система мероприятий по подготовке к защите и по защите населения, материальных и культурных ценностей от опасностей военного времени.</p>
+                <p><strong>Чрезвычайная ситуация (ЧС)</strong> — обстановка на территории, сложившаяся в результате аварии, катастрофы или бедствия, которые могут повлечь человеческие жертвы и ущерб здоровью.</p>
+                
+                <div class="illustration-placeholder">[Место для иллюстрации: Схема взаимодействия работника и систем безопасности]</div>
+
+                <p><strong>Основные причины техногенных аварий:</strong></p>
+                <ul>
+                    <li>Отказ технических систем (дефекты, нарушение режимов).</li>
+                    <li>Человеческий фактор (более 60% аварий).</li>
+                    <li>Изношенность фондов и слабая дисциплина.</li>
+                </ul>
+                <p><strong>Опасные подразделения ОИЯИ:</strong> ЛНФ, ОГЭ, ЛФВЭ, ЛЯР, ЛЯП.</p>
+            </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide" id="slide-1">
+            <div class="slide-header">
+                <h2>Учебный вопрос №2: Характерные ЧС района</h2>
+                <div class="time-note">Время проведения: 5–20 минут</div>
+            </div>
+            <div class="content-block">
+                <p>Для г. Дубны и ОИЯИ характерны следующие угрозы:</p>
+                <ol>
+                    <li>Радиоактивное загрязнение (выброс на реакторе ИБР-2М).</li>
+                    <li>Катастрофическое затопление (разрушение плотины Иваньковского вдхр.).</li>
+                    <li>Террористические акты.</li>
+                    <li>Ураганы, бури, смерчи.</li>
+                    <li>Угроза БПЛА.</li>
+                </ol>
+                
+                <details class="accordion">
+                    <summary class="accordion-header">Сигнал "Внимание всем!" ▼</summary>
+                    <div class="accordion-content">
+                        <p>Непрерывное гудение сирен в течение 2-х минут.</p>
+                        <p><strong>Действия:</strong> Включить радио/ТВ местного канала, прослушать экстренное сообщение о характере угрозы и направлении выхода.</p>
+                    </div>
+                </details>
+
+                <div class="illustration-placeholder">[Место для фото: Сирена оповещения гражданской обороны]</div>
+            </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="slide" id="slide-2">
+            <div class="slide-header">
+                <h2>Учебный вопрос №3: Способы защиты</h2>
+                <div class="time-note">Время проведения: 5–20 минут</div>
+            </div>
+            <div class="content-block">
+                <p><strong>Радиационная опасность (реактор ИБР-2М):</strong></p>
+                <ul>
+                    <li>Главная угроза первых 8 суток — радиоактивный йод-131.</li>
+                    <li><strong>Защита щитовидной железы:</strong> Прием таблеток йодида калия (или 3-5 капель обычного йода на стакан воды для взрослых).</li>
+                </ul>
+                
+                <div class="illustration-placeholder">[Место для инфографики: Алгоритм герметизации помещения]</div>
+
+                <p><strong>При угрозе выброса необходимо:</strong></p>
+                <ol>
+                    <li>Укрыться в закрытом помещении.</li>
+                    <li>Герметизировать окна, двери, вентиляцию (скотч, одеяла).</li>
+                    <li>Продукты и воду хранить в закрытой таре.</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="slide" id="slide-3">
+            <div class="slide-header">
+                <h2>Учебный вопрос №4: Сигналы ГО</h2>
+                <div class="time-note">Время проведения: 2–10 минут</div>
+            </div>
+            <div class="content-block">
+                <p>Установленные способы доведения информации: сирены, громкоговорители, речевая информация администрации ОИЯИ.</p>
+                
+                <details class="accordion">
+                    <summary class="accordion-header">Виды сигналов ▼</summary>
+                    <div class="accordion-content">
+                        <ul>
+                            <li><strong>"Воздушная тревога":</strong> Опасность поражения противником. Прекращение работ, укрытие в ЗС.</li>
+                            <li><strong>"Отбой воздушной тревоги":</strong> Разрешение покинуть укрытия.</li>
+                            <li><strong>"Радиационная опасность":</strong> Движется облако. Надеть респиратор, взять запас еды, уйти в убежище.</li>
+                            <li><strong>"Химическая опасность":</strong> Обнаружено заражение. Надеть противогаз и средства защиты кожи.</li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="slide" id="slide-4">
+            <div class="slide-header">
+                <h2>Учебный вопрос №5: Порядок действий при сигналах</h2>
+                <div class="time-note">Время проведения: 2–10 минут</div>
+            </div>
+            <div class="content-block">
+                <p>Главное правило: сохранять спокойствие, действовать быстро и без паники.</p>
+                <ul>
+                    <li>Выполнять указания непосредственного начальника.</li>
+                    <li>Переспросить коллег, правильно ли понята информация.</li>
+                    <li>Следовать установленным правилам поведения строго и неукоснительно.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 6 -->
+        <div class="slide" id="slide-5">
+            <div class="slide-header">
+                <h2>Учебный вопрос №6: АХОВ и Радиация</h2>
+                <div class="time-note">Время проведения: 6–30 минут</div>
+            </div>
+            <div class="content-block">
+                <p><strong>При химической аварии:</strong></p>
+                <ul>
+                    <li>Закрыть окна, отключить электричество.</li>
+                    <li>Выходить из зоны перпендикулярно ветру.</li>
+                    <li>Дыхание через влажную ткань или респиратор.</li>
+                </ul>
+                
+                <div class="illustration-placeholder">[Место для схемы: Направления выхода из зоны заражения относительно ветра]</div>
+
+                <p><strong>При радиационной аварии (если нельзя выйти):</strong></p>
+                <ul>
+                    <li>Герметизация помещения (заклейка щелей).</li>
+                    <li>Создание запаса воды и еды.</li>
+                    <li>Прием душа, снятие верхней одежды в пакет.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 7 -->
+        <div class="slide" id="slide-6">
+            <div class="slide-header">
+                <h2>Учебный вопрос №7: Индивидуальные средства защиты (СИЗ)</h2>
+                <div class="time-note">Время проведения: 6–30 минут</div>
+            </div>
+            <div class="content-block">
+                <p><strong>В наличии в ОИЯИ:</strong> Противогазы ГП-5/ГП-7, костюмы Л-1, респираторы Р-2.</p>
+                
+                <div class="illustration-placeholder">[Место для фото: Гражданский противогаз ГП-7 крупным планом]</div>
+
+                <details class="accordion">
+                    <summary class="accordion-header">Правила использования противогаза ▼</summary>
+                    <div class="accordion-content">
+                        <ol>
+                            <li>Сумка на левом боку, клапан от себя.</li>
+                            <li>По команде "Газы!" задержать дыхание, закрыть глаза.</li>
+                            <li>Надеть шлем-маску снизу вверх.</li>
+                            <li>Сделать резкий выдох, открыть глаза и возобновить дыхание.</li>
+                            <li>Противогаз надет верно, если стекла напротив глаз, прилегание плотное.</li>
+                        </ol>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- Slide 8 -->
+        <div class="slide" id="slide-7">
+            <div class="slide-header">
+                <h2>Учебный вопрос №8: Средства коллективной защиты</h2>
+                <div class="time-note">Время проведения: 6–30 минут</div>
+            </div>
+            <div class="content-block">
+                <p>На территории ОИЯИ имеются защитные сооружения (ЗС ГО). Работники укрываются группами по подразделениям со старшим группы.</p>
+                
+                <div class="illustration-placeholder">[Место для плана этажа типового убежища ОИЯИ]</div>
+
+                <details class="accordion">
+                    <summary class="accordion-header">Запрещено в убежище ▼</summary>
+                    <div class="accordion-content">
+                        <ul>
+                            <li>Ходить без надобности и шуметь.</li>
+                            <li>Курить, зажигать свечи/керосиновые лампы.</li>
+                            <li>Самостоятельно включать электрооборудование и дизель.</li>
+                            <li>Прикасаться к фильтровентиляционным агрегатам.</li>
+                        </ul>
+                    </div>
+                </details>
+                <p>Температура внутри: не выше 32°C. Уборка проводится укрываемыми 2 раза в сутки.</p>
+            </div>
+        </div>
+
+        <!-- Slide 9 -->
+        <div class="slide" id="slide-8">
+            <div class="slide-header">
+                <h2>Учебный вопрос №9: Эвакуация</h2>
+                <div class="time-note">Время проведения: 6–30 минут</div>
+            </div>
+            <div class="content-block">
+                <p>Сборные эвакуационные пункты (СЭП) для сотрудников ОИЯИ:</p>
+                <ul>
+                    <li><strong>СЭП №4:</strong> ДК «Мир», аллея Высоцкого, д. 1.</li>
+                    <li><strong>СЭП №5:</strong> Стадион «НАУКА», ул. Молодежная, д. 11, стр. 3.</li>
+                </ul>
+                
+                <div class="illustration-placeholder">[Место для карты: Маршрут Дубна -> пос. Запрудня]</div>
+
+                <p><strong>Что взять с собой:</strong> Документы, деньги, смену белья, продукты на 2-3 дня.</p>
+                <p><strong>Пункт назначения:</strong> пос. Запрудня, Талдомского района Московской области.</p>
+            </div>
+        </div>
+
+        <!-- Slide 10 -->
+        <div class="slide" id="slide-9">
+            <div class="slide-header">
+                <h2>Учебный вопрос №10: Права и обязанности граждан РФ</h2>
+                <div class="time-note">Время проведения: 2–15 минут</div>
+            </div>
+            <div class="content-block">
+                <p><strong>Права:</strong> на защиту жизни и здоровья, на информацию о рисках, на использование имущества ГО, на возмещение ущерба и компенсации.</p>
+                <p><strong>Обязанности:</strong> соблюдать законы в области ГО и ЧС, изучать способы защиты, выполнять правила поведения при угрозе ЧС, оказывать содействие органам власти.</p>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="navigation-controls">
+            <button class="btn-control btn-prev" id="prevBtn">◀ Назад</button>
+            <button class="btn-control btn-next" id="nextBtn">Далее ▶</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const slides = document.querySelectorAll('.slide');
+    const navLinks = document.querySelectorAll('.nav-link');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        if (index < 0 || index >= slides.length) return;
+        
+        // Update slides
+        slides.forEach(s => s.classList.remove('active'));
+        slides[index].classList.add('active');
+        
+        // Update navigation
+        navLinks.forEach(link => link.classList.remove('active'));
+        navLinks[index].classList.add('active');
+        
+        // Manage buttons
+        document.getElementById('prevBtn').disabled = index === 0;
+        document.getElementById('nextBtn').disabled = index === slides.length - 1;
+        
+        currentSlide = index;
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', () => showSlide(currentSlide + 1));
+    document.getElementById('prevBtn').addEventListener('click', () => showSlide(currentSlide - 1));
+    
+    navLinks.forEach((link, index) => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSlide(index);
+        });
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') showSlide(currentSlide + 1);
+        if (e.key === 'ArrowLeft') showSlide(currentSlide - 1);
+    });
+</script>
+
+</body>
+</html>
