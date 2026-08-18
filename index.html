@@ -121,39 +121,49 @@
     <!-- Slides Content -->
     <div class="slide-container">
       <!-- Slide 1 -->
-<div class="slide active" id="slide-0"> <!-- ОБЯЗАТЕЛЬНО slide-0! -->
-    <div class="slide-header">
-        <h2>Учебный вопрос №1: Понятия ГО и ЧС</h2>
-        <div class="time-note">Время проведения: 5–15 минут</div>
-    </div>
-    <div class="content-block">
-        <p><strong>Гражданская оборона (ГО)</strong> – система мероприятий по подготовке к защите и по защите населения, материальных и культурных ценностей от опасностей военного времени.</p>
-        <p><strong>Чрезвычайная ситуация (ЧС)</strong> — обстановка на территории, сложившаяся в результате аварии, катастрофы или бедствия, которые могут повлечь человеческие жертвы и ущерб здоровью.</p>
-
-        <!-- Блок с картинкой -->
-        <div style="text-align:center; margin-top:30px; margin-bottom:15px;">
-            <img src="causes_of_tech_accidents.png" alt="Причины техногенных аварий"
-                 style="width:100%; max-width:800px; height:auto; display:block;">
+<div class="slide active" id="slide-0">
+    <!-- ОБЯЗАТЕЛЬНЫЙ КОНТЕЙНЕР ДЛЯ СЛАЙДЕРА -->
+    <div class="slide-container">
+        <div class="slide-header">
+            <h2>Учебный вопрос №1: Понятия ГО и ЧС</h2>
+            <div class="time-note">Время проведения: 5–15 минут</div>
         </div>
 
-        <!-- Список причин аварий -->
-        <p><strong>Основные причины техногенных аварий:</strong></p>
-        <ul>
-          <li>Отказ технических систем (дефекты, нарушение режимов).</li>
-          <li>Человеческий фактор (более 60% аварий).</li>
-          <li>Изношенность фондов и слабая дисциплина.</li>
-        </ul>
+        <div class="content-block">
+            <p><strong>Гражданская оборона (ГО)</strong> – система мероприятий по подготовке к защите и по защите населения, материальных и культурных ценностей от опасностей военного времени.</p>
+            <p><strong>Чрезвычайная ситуация (ЧС)</strong> — обстановка на территории, сложившаяся в результате аварии, катастрофы или бедствия, которые могут повлечь человеческие жертвы и ущерб здоровью.</p>
 
-        <p><strong>Опасные подразделения ОИЯИ:</strong> ЛНФ, ОГЭ, ЛФВЭ, ЛЯР, ЛЯП.</p>
+            <!-- Адаптация картинки через класс .img-responsive -->
+            <div style="text-align:center; margin-top:30px; margin-bottom:15px;">
+                <img src="causes_of_tech_accidents.png"
+                     alt="Причины техногенных аварий"
+                     class="img-responsive" /* <-- ВАЖНО */
+                     style="max-width:800px; height:auto; display:block;"
+                >
+            </div>
 
-      <!-- Навигация (кнопки "Назад", номер слайда, "Далее") -->
-      <div class="slide-navigation">
-        <button class="prev-slide">◄ Назад</button>
-        <div class="current-slide-number"></div>
-        <button class="next-slide">Далее ►</button>
-      </div>
-    </div>
-</div>
+            <p><strong>Основные причины техногенных аварий:</strong></p>
+            <ul>
+              <li>Отказ технических систем (дефекты, нарушение режимов).</li>
+              <li>Человеческий фактор (более 60% аварий).</li>
+              <li>Изношенность фондов и слабая дисциплина.</li>
+            </ul>
+
+            <p><strong>Опасные подразделения ОИЯИ:</strong> ЛНФ, ОГЭ, ЛФВЭ, ЛЯР, ЛЯП.</p>
+
+            <!-- НАВИГАЦИЯ -->
+            <div class="slide-navigation">
+                <!-- Кнопка Назад должна быть серой и неактивной на первом слайде -->
+                <button class="prev-slide" disabled>◄ Назад</button>
+                <div class="current-slide-number"></div>
+                
+                <!-- Чтобы кнопка Далее стала синей, нужно добавить ей класс active -->
+                <button class="next-slide active">Далее ►</button>
+            </div>
+        </div>
+        
+    </div> <!-- /slide-container -->
+</div> <!-- /slide-0 -->
 
        <!-- Slide 2 -->
 <div class="slide" id="slide-2">
