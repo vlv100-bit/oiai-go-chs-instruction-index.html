@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Тест по ГО и ЧС | ОИЯИ г. Дубна</title>
+    <!-- Подключаем шрифты -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0057b8;
+            --secondary-color: #ffd700;
+            --text-dark: #2c3e50;
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        /* Общие стили */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+
+        .test-container {
+            width: 95%; max-width: 1200px; height: 85vh;
+            background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 12px; overflow: hidden;
+            display: grid; place-items: center;
+        }
+
+        /* Стиль колеса */
+        .wheel {
+            position: relative;
+            width: 500px; height: 500px;
+            margin-bottom: 2rem;
+        }
+        .wheel canvas { image-rendering: crisp-edges; }
+        .pointer {
+            position: absolute; top: -20px; left: calc(50% - 10px); z-index: 2;
+            width: 20px; height: 60px;
+            background: linear-gradient(to bottom, transparent, black);
+            transform: rotate(-45deg) translateY(-30px);
+        }
+
+        /* Кнопки */
+        button.btn-control {
+            padding: 12px 25px; border: none; border-radius: 50px; font-size: 1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .btn-spin { background: var(--primary-color); color: white; }
+        .btn-close-modal { background: #6c757d; color: white; float: right; }
+        .btn-control:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-control:hover:not(:disabled) {
+            transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+        .modal.active ~ .modal-overlay { display: block; }
+        .modal {
+            display: none; position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: white; padding: 2rem; border-radius: 12px;
+            text-align: center; max-width: 80vw;
+        }
+        .modal.active { display: block; }
+
+        /* Итоговое сообщение */
+        .result-message {
+            font-size: 1.5rem; margin-top: 2rem;
+            color: var(--primary-color);
+        }
+        @media screen and (max-width: 768px) {
+            .wheel { width: 300px; height: 300px; }
+        }
+    </style>
+</head>
+<body class="loading">
+<div class="test-container">
+    <!-- Колесо фортуны -->
+    <div class="wheel">
+        <canvas id="wheelCanvas"></canvas>
+        <div class="pointer"></div>
+    </div>
+
+    <!-- Главная кнопка -->
+    <button id="spinBtn" class="btn-control btn-spin">Вращать</button>
+
+    <!-- Модальное окно с вопросами -->
+    <section class="modal">
+        <h2></h2>
+        <form>
+            <!-- Здесь будут вставляться вопросы из базы данных -->
+        </form>
+        <button type="submit" class="btn-control">Ответить</button>
+        <button class="btn-control btn-close-modal">Закрыть</button>
+    </section>
+
+    <!-- Фоновое затемнение -->
+    <div class="modal-overlay"></div>
+</div>
+
+<script>
+// База данных вопросов (встроена в скрипт)
+const questions = [
+    // ... здесь находится база данных из предыдущего сообщения ...
+];
+
+// Настройки колеса
+const wheelData = [
+    "Понятия ГО и ЧС",
+    "Характерные ЧС района",
+    "Способы защиты работников",
+    "Сигналы оповещения",
+    "Действия при сигналах",
+    "АХОВ и Радиация",
+    "Использование СИЗ",
+    "Коллективная защита",
+    "Эвакуация",
+    "Права и обязанности"
+];
+let currentThemeId = null;
+let score = 0;
+let roundsPlayed = 0;
+
+// Рисуем колесо
+const ctx = document.getElementById('wheelCanvas').getContext('2d');
+function drawWheel() {
+    const size = Math.min(ctx.canvas.width, ctx.canvas.height);
+    const cx = cy = size / 2;
+    const radius = size / 2 - 20;
+    
+    let startAngle = 0;
+    for(let i = 0; i < wheelData.length; i++) {
+        const endAngle = startAngle + (Math.PI * 2 / wheelData.length);
+        
+        // Цвет сектора зависит от того, выпал ли он ранее
+        if(currentThemeId === i) {
+            ctx.fillStyle = '#FFD700'; // Выбранная тема
+        } else {
+            ctx.fillStyle = '#EFEFEF';
+        }
+        
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle);
+        ctx.lineTo(cx, cy);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Текст темы
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate((startAngle + endAngle) / 2);
+        ctx.textAlign = 'center';
+        ctx.font = `bold ${size/20}px Segoe UI`;
+        ctx.fillText(wheelData[i], 0, -(radius / 2));
+        ctx.restore();
+        
+        startAngle = endAngle;
+    }
+}
+drawWheel(); // Отрисовка начального состояния
+
+// Логика вращения
+document.getElementById('spinBtn').addEventListener('click', () => {
+    spinBtn.disabled = true;
+    const duration = 5000; // Длительность анимации
+    const speed = 360 / duration;
+    let rotation = 0;
+
+    function animate(timePassed) {
+        rotation += timePassed * speed;
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.save();
+        ctx.translate(ctx.canvas.width / 2, ctx.canvas.height / 2);
+        ctx.rotate(rotation * Math.PI / 180);
+        drawWheel();
+        ctx.restore();
+
+        if(timePassed > duration) {
+            // Определяем сектор, на который упало колесо
+            const finalRotation = rotation % 360;
+            const sectorSize = 360 / wheelData.length;
+            const selectedSector = Math.floor(finalRotation / sectorSize);
+            
+            // Находим тему по её названию
+            currentThemeId = wheelData.findIndex(theme => theme === wheelData[selectedSector]);
+            showQuestionsForTheme(currentThemeId);
+        } else {
+            requestAnimationFrame(animate);
+        }
+    }
+    requestAnimationFrame(animate);
+});
+
+// Показываем вопросы по выбранной теме
+function showQuestionsForTheme(id) {
+    const modal = document.querySelector('.modal');
+    const form = modal.querySelector('form');
+    const titleEl = modal.querySelector('h2');
+
+    // Заголовок модалки
+    titleEl.innerHTML = `<strong>${wheelData[id]}</strong><br>(Выпало случайным образом!)`;
+
+    // Генерируем форму с вопросами именно этой темы
+    form.innerHTML = '';
+    const filteredQ = questions.filter(q => q.theme === wheelData[id]);
+    filteredQ.forEach(question => {
+        const questionDiv = document.createElement('div');
+        questionDiv.classList.add('question-block');
+
+        // Сам вопрос
+        const label = document.createElement('label');
+        label.style.display = 'block';
+        label.innerText = question.question;
+        questionDiv.appendChild(label);
+
+        // Варианты ответов
+        question.options.forEach(opt => {
+            const input = document.createElement('input');
+            input.type = question.type === 'multiple' ? 'checkbox' : 'radio';
+            input.name = `q-${question.id}`;
+            input.value = opt.isCorrect;
+
+            const optionLabel = document.createElement('label');
+            optionLabel.innerHTML = opt.text;
+
+            const container = document.createElement('div');
+            container.style.display = 'flex; align-items:center; gap: 1ch; margin-bottom: 0.5em;';
+            container.append(input, optionLabel);
+            questionDiv.append(container);
+        });
+
+        form.append(questionDiv);
+    });
+
+    // Открываем модалку
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Отправка формы
+document.querySelector('.modal form').addEventListener('submit', e => {
+    e.preventDefault();
+    const answers = [];
+
+    // Собираем ответы пользователя
+    [...document.querySelectorAll('[type="radio"], [type="checkbox"]')]
+        .filter(el => el.checked)
+        .forEach(el => {
+            const qid = parseInt(el.name.split('-')[1]); // ID вопроса
+            const isCorrect = el.value === 'true';
+            answers.push({qid, correct: isCorrect});
+        });
+
+    // Подсчёт очков
+    answers.forEach(ans => {
+        if(ans.correct) score += 10;
+        else score -= 10;
+    });
+
+    // Следующий раунд
+    roundsPlayed++;
+    if(roundsPlayed >= 5) {
+        finishTest();
+    } else {
+        closeModal();
+        spinBtn.disabled = false;
+    }
+});
+
+// Закрытие модалки
+function closeModal() {
+    const modal = document.querySelector('.modal');
+    modal.classList.remove('active');
+    document.body.style.overflow = ''; // Возвращаем скролл страницы
+}
+
+// Ограничение повторного прохождения
+function checkCooldown() {
+    const cooldownKey = 'oiai-test-cooldown';
+    const now = new Date().getTime();
+    const lastAttempt = localStorage.getItem(cooldownKey);
+
+    if(lastAttempt && (now - parseInt(lastAttempt)) < 24 * 60 * 60 * 1000) {
+        alert("Вы уже проходили этот тест сегодня. Повторное прохождение возможно через 24 часа.");
+        window.location.reload();
+    }
+
+    // Записываем текущее время в куки
+    localStorage.setItem(cooldownKey, now.toString());
+}
+checkCooldown();
+
+// Финальный экран
+function finishTest() {
+    const resultMsg = `
+        <h3>Ваш результат:</h3>
+        <p style="font-size: 2.5rem;">${score}/250</p>
+        ${score >= 210 ? '<span style="color:#00A800;">Поздравляем! Вы отлично изучили презентацию.</span>' :
+                     score >= 160 ? '<span style="color:#FFC107;">Вы хорошо справились с тестом. Рекомендуем повторить некоторые темы.</span>' :
+                     '<span style="color:#DC3545;">Ваша оценка: [X]/250. Мы рекомендуем вам повторно ознакомиться с презентацией и проверить свои знания через 24 часа.</span>'}
+    `;
+
+    const modal = document.querySelector('.modal');
+    modal.querySelector('h2').innerHTML = "<strong>ФИНАЛЬНЫЙ РЕЗУЛЬТАТ</strong>";
+    modal.querySelector('form').remove();
+    modal.insertAdjacentHTML('beforeend', `<div class="result-message">${resultMsg}</div>`);
+}
+</script>
+
+</body>
+</html>
